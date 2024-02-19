@@ -50,14 +50,35 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         pass
         #falta codi
     
-    def desa(self,pelicula:Pelicula) -> Pelicula:
-        pass
-        #falta codi
+    def desa(self, pelicula: Pelicula) -> Pelicula:
+        #Aqui creamos la nueva pelicula creada.
+        cursor = self._conn.cursor(buffered=True)
+        consulta = "INSERT INTO PELICULA (titulo, anyo, puntuacion, votos) VALUES (%s, %s, %s, %s);"
+        valors = (pelicula.titol, pelicula.anyo, pelicula.puntuacion, pelicula.votos)
+        cursor.execute(consulta, valors)
+        self._conn.commit()
+        cursor.close()
+        return pelicula
     
-    def llegeix(self, any: int) -> Pelicula:
-        pass
-        #falta codi
+    def llegeix(self, any: int) -> List[Pelicula]:
+        #Lista todas las peliculas por ANYO:
+        cursor = self._conn.cursor(buffered=True)
+        consulta = "SELECT id, titulo, anyo, puntuacion, votos FROM PELICULA WHERE anyo = %s;"
+        cursor.execute(consulta, (any,))
+        registres = cursor.fetchall()
+        cursor.close()
+        resultat = []
+        for registre in registres:
+            pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
+            resultat.append(pelicula)
+        return resultat
     
-    def canvia(self,pelicula:Pelicula) -> Pelicula:
-        pass
-        #falta codi
+    def canvia(self, id: int, nuevo_titulo: str) -> Pelicula:
+        #Aqui modificamos el titulo de la pelicula segun su id y le añadimos un nuevo titulo.
+        cursor = self._conn.cursor(buffered=True)
+        consulta = "UPDATE PELICULA SET titulo = %s WHERE id = %s;"
+        valors = (nuevo_titulo, id)
+        cursor.execute(consulta, valors)
+        self._conn.commit()
+        cursor.close()
+        return id
