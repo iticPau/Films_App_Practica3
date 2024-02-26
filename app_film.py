@@ -61,13 +61,10 @@ def mostra_seguents(llistapelicula):
 
 def mostra_menu():
     print("0.- Salir")
-    print("1.- Muestra las peliculas")
-
-def mostra_menu_llegir():
-    return input("1.- Muestra las 10 primeras peliculas:  \n2.- Muestra peliculas segun el anyo: " )
-
-def mostra_menu_canvia_inserta():
-    return input("1.- Cambia el titulo de la pelicula por ID:   \n2.- Afageix una nova pelicula: " )
+    print("1.- Muestra las 10 primeras peliculas: ")
+    print("2.- Muestra peliculas segun el anyo: ")
+    print("3.- Afageix una nova pelicula: ")
+    print("4.- Cambia el titulo de la pelicula por ID: ")
 
 def mostra_menu_next10():
     print("0.- Salir")
@@ -77,41 +74,45 @@ def mostra_menu_next10():
 def procesa_opcio(context):
     return {
         "0": lambda ctx : mostra_lent("Fins la propera"),
-        "1": lambda ctx : mostra_llista(ctx['llistapelis'])
+        "1": lambda ctx : mostra_llista(ctx['llistapelis']),
+        "2": lambda ctx : mostra_llista(ctx['llistapelis']),
+        "3": lambda ctx : mostra_llista(ctx['llistapelis']),
+        "4": lambda ctx : mostra_llista(ctx['llistapelis'])
     }.get(context["opcio"], lambda ctx : mostra_lent("opcio incorrecta!!!"))(context)
 
-def database_read(opt:int, id:int = None):
+def database_read(context:dict, id:int = None, anyo:int = None):
     logging.basicConfig(filename='pelicules.log', encoding='utf-8', level=logging.DEBUG)
     la_meva_configuracio = get_configuracio(RUTA_FITXER_CONFIGURACIO)
     persistencia = get_persistencies(la_meva_configuracio)
-    films = Llistapelis(persistencia)
-    films.llegeix_de_disc(opt, id)
+    films = Llistapelis(persistencia["pelicula"])
+    films.llegeix_de_disc(context, id, anyo)
     return films
 
 def bucle_principal(context):
     opcio = None
-    
+    films = None
 
     while opcio != '0':
         mostra_menu()
         opcio = input("Selecciona una opció: ")
         context["opcio"] = opcio
-        
         if context["opcio"] == '1':
-            opcio = mostra_menu_llegir()
-            if opcio == '1':
-                id = input("Introduce una ID para poder empezar: ")
-                films = database_read(opcio, id)
-            elif opcio == '2':
-                input("Introduce un ANYO para buscar las pelis de ese anyo: ")
-                films = database_read(opt = opcio)
-            context["llistapelis"] = films
+            id = input("Introduce una ID para poder empezar: ")
+            films = database_read(context, id = id)
+            mostra_menu_next10()                
         elif context["opcio"] == '2':
-            pass
+            anyo = input("Introduce un ANYO para buscar las pelis de ese anyo: ")
+            films = database_read(None, anyo, context)
+        elif context["opcio"] == '3':
+            titol = input("El TITULO para la nueva pelicula: ")
+            anyo = input("El ANYO para la nueva pelicula: ")
+            puntuacion = input("La PUNTUACION para la nueva pelicula: ")
+            votos = input("Los VOTOS para la nueva pelicula: ")
+            films = database_read(None, anyo, titol, puntuacion,votos, context)
+        context["llistapelis"] = films
+        if films is not None:
+            procesa_opcio(context)
             #falta codi
-        procesa_opcio(context)
-
-        #falta codi
 
 
 def main():

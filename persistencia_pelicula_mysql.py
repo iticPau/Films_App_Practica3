@@ -5,6 +5,7 @@ from pelicula import Pelicula
 from typing  import List
 import mysql.connector
 import logging
+from llistapelis import Llistapelis
 
 class Persistencia_pelicula_mysql(IPersistencia_pelicula):
     def __init__(self, credencials) -> None:
@@ -46,7 +47,7 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             resultat.append(pelicula)
         return resultat
     
-    def totes_pag(self, id=None) -> List[Pelicula]:
+    def totes_pag(self, id:int) -> List[Pelicula]:
         cursor = self._conn.cursor(buffered=True)
         if id is None:
             consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA LIMIT 10;"
@@ -55,11 +56,12 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA WHERE ID >= %s LIMIT 10;"
             cursor.execute(consulta, (id,))
         registres = cursor.fetchall()
-        cursor.reset()
+        cursor.close()
         resultat = []
         for registre in registres:
             pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
             resultat.append(pelicula)
+        self._peliculas = resultat
         return resultat
     
     def desa(self, pelicula: Pelicula) -> Pelicula:
@@ -69,16 +71,16 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         valors = (pelicula.titol, pelicula.any, pelicula.puntuacio, pelicula.vots)
         cursor.execute(consulta, valors)
         self._conn.commit()
-        cursor.reset()
+        cursor.close()
         return pelicula
     
-    def llegeix(self, any: int) -> List[Pelicula]:
+    def llegeix(self, anyo: int) -> List[Pelicula]:
         #Lista todas las peliculas por ANYO:
         cursor = self._conn.cursor(buffered=True)
         consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA WHERE ANYO = %s;"
-        cursor.execute(consulta, (any,))
+        cursor.execute(consulta, (anyo,))
         registres = cursor.fetchall()
-        cursor.reset()
+        cursor.close()
         resultat = []
         for registre in registres:
             pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
@@ -93,5 +95,5 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         valors = (nuevo_titulo, id)
         cursor.execute(consulta, valors)
         self._conn.commit()
-        cursor.reset()
+        cursor.close()
         return id

@@ -8,7 +8,7 @@ from pelicula import Pelicula
 class Llistapelis():
     def __init__ (self, persistencia_pelicula: IPersistencia_pelicula) -> None:
         self._pelicules = []
-        self._ult_id = 0
+        self._ult_id = None
         self._persistencia_pelicula = persistencia_pelicula
         
     @property
@@ -35,11 +35,13 @@ class Llistapelis():
             }   
         return json.dumps(self_dict)
 
-    def llegeix_de_disc(self, opt: int, id: int = None, any: int = None) -> None:
-        if opt == 1:
-            self._ult_id = id
+    def llegeix_de_disc(self, context:dict, id: int, anyo: int):
+        print(type(self._persistencia_pelicula))
+        if context["opcio"] == '1':
             self._peliculas = self._persistencia_pelicula.totes_pag(id)
-        elif opt == 2:
-            self._peliculas = self._persistencia_pelicula.llegeix(any)
-        elif opt == 3:
-            self._peliculas = self._persistencia_pelicula.desa()
+            self._ult_id = int(id) + 9
+        elif context["opcio"] == '2':
+            self._peliculas = self._persistencia_pelicula.llegeix(anyo)
+
+    
+
