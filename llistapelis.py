@@ -7,9 +7,9 @@ from pelicula import Pelicula
 
 class Llistapelis():
     def __init__ (self, persistencia_pelicula: IPersistencia_pelicula) -> None:
-        self._pelicules = []
-        self._ult_id = None
-        self._persistencia_pelicula = persistencia_pelicula
+        self._pelicules = List[Pelicula]
+        self._ult_id = 0
+        self._persistencia_pelicula:IPersistencia_pelicula = persistencia_pelicula
         
     @property
     def pelicules(self) -> List[Pelicula]:
@@ -35,13 +35,9 @@ class Llistapelis():
             }   
         return json.dumps(self_dict)
 
-    def llegeix_de_disc(self, context:dict, id: int, anyo: int):
-        print(type(self._persistencia_pelicula))
-        if context["opcio"] == '1':
-            self._peliculas = self._persistencia_pelicula.totes_pag(id)
-            self._ult_id = int(id) + 9
-        elif context["opcio"] == '2':
-            self._peliculas = self._persistencia_pelicula.llegeix(anyo)
-
-    
-
+    def llegeix_de_disc(self, opt:int, id:int = None, any:int = None, offset:int=0):
+        if opt == '1':
+            self._pelicules = self._persistencia_pelicula.totes_pag(id)
+            self._ult_id = int(id) + 10
+        elif opt == '2':
+            self._pelicules = self._persistencia_pelicula.llegeix(any)

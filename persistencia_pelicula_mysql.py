@@ -49,19 +49,12 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
     
     def totes_pag(self, id:int) -> List[Pelicula]:
         cursor = self._conn.cursor(buffered=True)
-        if id is None:
-            consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA LIMIT 10;"
-            cursor.execute(consulta)
-        else:
-            consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA WHERE ID >= %s LIMIT 10;"
-            cursor.execute(consulta, (id,))
-        registres = cursor.fetchall()
-        cursor.close()
+        query = f"SELECT * FROM PELICULA WHERE ID >= {id} LIMIT 10"
+        cursor.execute(query)
+        result = cursor.fetchall()
         resultat = []
-        for registre in registres:
-            pelicula = Pelicula(registre[1], registre[2], registre[3], registre[4], self, registre[0])
-            resultat.append(pelicula)
-        self._peliculas = resultat
+        for peli in result:
+            resultat.append(Pelicula(peli[1], peli[2], peli[3], peli[4], self, peli[0]))
         return resultat
     
     def desa(self, pelicula: Pelicula) -> Pelicula:
@@ -75,7 +68,6 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
         return pelicula
     
     def llegeix(self, anyo: int) -> List[Pelicula]:
-        #Lista todas las peliculas por ANYO:
         cursor = self._conn.cursor(buffered=True)
         consulta = "SELECT ID, TITULO, ANYO, PUNTUACION, VOTOS FROM PELICULA WHERE ANYO = %s;"
         cursor.execute(consulta, (anyo,))
