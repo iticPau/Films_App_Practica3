@@ -57,15 +57,13 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             resultat.append(Pelicula(peli[1], peli[2], peli[3], peli[4], self, peli[0]))
         return resultat
     
-    def desa(self, pelicula: Pelicula) -> Pelicula:
-        #Aqui creamos la nueva pelicula creada.
-        cursor = self._conn.cursor(buffered=True)
-        consulta = "INSERT INTO PELICULA (TITULO, ANYO, PUNTUACION, VOTOS) VALUES (%s, %s, %s, %s);"
-        valors = (pelicula.titol, pelicula.any, pelicula.puntuacio, pelicula.vots)
-        cursor.execute(consulta, valors)
+    def desa(self, pelicula: Pelicula) -> bool:
+        cursor = self._conn.cursor()
+        query = f"INSERT INTO PELICULA (ID, TITULO, ANYO, PUNTUACION, VOTOS) VALUES ({pelicula.id},{pelicula.titol}, {pelicula.any}, {pelicula.puntuacio}, {pelicula.vots});"
+        cursor.execute(query)
         self._conn.commit()
         cursor.close()
-        return pelicula
+        return True
     
     def llegeix(self, anyo: int) -> List[Pelicula]:
         cursor = self._conn.cursor(buffered=True)
@@ -79,13 +77,10 @@ class Persistencia_pelicula_mysql(IPersistencia_pelicula):
             resultat.append(pelicula)
         return resultat
     
-    def canvia(self, id: int, nuevo_titulo: str) -> Pelicula:
-        #Aqui modificamos el titulo de la pelicula segun su id y le añadimos un nuevo titulo.
-        cursor = self._conn.cursor(buffered=True)
-        id=input()
-        consulta = "UPDATE PELICULA SET TITULO = '%s' WHERE ID = %s;"
-        valors = (nuevo_titulo, id)
-        cursor.execute(consulta, valors)
-        self._conn.commit()
-        cursor.close()
-        return id
+    def canvia(self, lista:dict, id:int) -> bool:         
+        cursor = self._conn.cursor(buffered=True)         
+        if lista["selec"] == "titulo":             
+            query = f"UPDATE PELICULA SET TITULO='{lista['valor']}' WHERE id = {id}"         
+        cursor.execute(query)         
+        self._conn.commit()         
+        return True

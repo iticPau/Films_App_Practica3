@@ -35,9 +35,16 @@ class Llistapelis():
             }   
         return json.dumps(self_dict)
 
-    def llegeix_de_disc(self, opt:int, id:int = None, any:int = None, offset:int=0):
-        if opt == '1':
+    def llegeix_de_disc(self, selec:int, id:int = None, any:int = None):
+        if selec == '1':
             self._pelicules = self._persistencia_pelicula.totes_pag(id)
             self._ult_id = int(id) + 10
-        elif opt == '2':
+        elif selec == '2':
             self._pelicules = self._persistencia_pelicula.llegeix(any)
+            
+    def escriu_al_disc(self, selec:str, lista_peli:dict = None, lista_modificada:dict = None, id:int = None):         
+        if selec == "crear":             
+            peli = Pelicula(**lista_peli, persistencia = self._persistencia_pelicula)             
+            if self._persistencia_pelicula.desa(peli): return True         
+        if selec == "modificar":             
+                if self._persistencia_pelicula.canvia(lista_modificada, id): return True 
